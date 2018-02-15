@@ -1,0 +1,15 @@
+[Unit]
+Description=Kafka Manager
+Documentation=https://github.com/yahoo/kafka-manager
+
+[Service]
+Type=simple
+User=kafka
+Group=kafka
+ExecStart=/home/kafka-manager-{{ kafka_manager_version }}/bin/kafka-manager
+StandardOutput=journal
+StandardError=journal
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
