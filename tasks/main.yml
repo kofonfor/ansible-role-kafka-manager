@@ -1,0 +1,52 @@
+- name: Download kafka-manager
+  get_url: url="https://github.com/yahoo/kafka-manager/archive/{{ kafka_manager_version }}.tar.gz" dest=/root/kafka-manager-{{ kafka_manager_version }}.tar.gz
+
+- name: unpack kafka-manager
+  unarchive: copy=no src="/root/kafka-manager-{{ kafka_manager_version }}.tar.gz" dest={{ kafka_manager_source_unarchive_prefix }}
+
+- name: build kafka-manager
+  shell: cd {{ kafka_manager_source_unarchive_prefix }}/kafka-manager-{{ kafka_manager_version }} && ./sbt clean dist creates={{ kafka_manager_source_unarchive_prefix }}/kafka-manager-{{ kafka_manager_version }}/target/universal/kafka-manager-{{ kafka_manager_version }}.zip
+
+- name: unpack the binary archive
+  unarchive: copy=no src="{{ kafka_manager_source_unarchive_prefix }}/kafka-manager-{{ kafka_manager_version }}/target/universal/kafka-manager-{{ kafka_manager_version }}.zip" dest={{ kafka_manager_unarchive_prefix }}
+
+- name: copy binary kafka-manager to its final destination
+  shell: rsync -av --exclude=conf/ {{ kafka_manager_unarchive_prefix }}/kafka-manager-{{ kafka_manager_version }}/ /home/kafka-manager-{{ kafka_manager_version }}/ creates="/home/kafka-manager-{{ kafka_manager_version }}"
+
+- name: create a config dir
+  file: state=directory dest=/home/kafka-manager-{{ kafka_manager_version }}/conf
+
+- name: create a config dir in /etc
+  file: state=directory dest=/etc/kafka-manager
+
+- name: put /etc/kafka-manager/application.conf
+  template: src=application.conf dest=/etc/kafka-manager/application.conf backup=yes
+
+- name: link /home/kafka-manager-{{ kafka_manager_version }}/application.conf
+  file: state=link src=/etc/kafka-manager/application.conf dest=/home/kafka-manager-{{ kafka_manager_version }}/conf/application.conf
+
+- name: put /etc/kafka-manager/logback.xml
+  template: src=logback.xml dest=/etc/kafka-manager/logback.xml backup=yes
+
+- name: link /home/kafka-manager-{{ kafka_manager_version }}/logback.xml
+  file: state=link src=/etc/kafka-manager/logback.xml dest=/home/kafka-manager-{{ kafka_manager_version }}/conf/logback.xml
+
+- name: put /etc/kafka-manager/logger.xml
+  template: src=logger.xml dest=/etc/kafka-manager/logger.xml backup=yes
+
+- name: link /home/kafka-manager-{{ kafka_manager_version }}/logger.xml
+  file: state=link src=/etc/kafka-manager/logger.xml dest=/home/kafka-manager-{{ kafka_manager_version }}/conf/logger.xml
+
+- name: put /etc/kafka-manager/routes
+  template: src=routes dest=/etc/kafka-manager/routes backup=yes
+
+- name: link /home/kafka-manager-{{ kafka_manager_version }}/routes
+  file: state=link src=/etc/kafka-manager/routes dest=/home/kafka-manager-{{ kafka_manager_version }}/conf/routes
+
+- name: put /etc/kafka-manager/consumer.properties
+  template: src=consumer.properties dest=/etc/kafka-manager/consumer.properties backup=yes
+
+- name: link /home/kafka-manager-{{ kafka_manager_version }}/consumer.properties
+  file: state=link src=/etc/kafka-manager/consumer.properties dest=/home/kafka-manager-{{ kafka_manager_version }}/conf/consumer.properties
+
+
