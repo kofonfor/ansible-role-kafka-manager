@@ -6,7 +6,7 @@ Documentation=https://github.com/yahoo/kafka-manager
 Type=simple
 User=kafka
 Group=kafka
-ExecStart=/home/kafka-manager-{{ kafka_manager_version }}/bin/kafka-manager
+ExecStart=/home/kafka-manager-{{ kafka_manager_version }}/bin/kafka-manager -Dhttp.port={{ kafka_manager_port }}
 StandardOutput=journal
 StandardError=journal
 Restart=always

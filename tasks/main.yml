@@ -1,6 +1,9 @@
 - name: Download kafka-manager
   get_url: url="https://github.com/yahoo/kafka-manager/archive/{{ kafka_manager_version }}.tar.gz" dest=/root/kafka-manager-{{ kafka_manager_version }}.tar.gz
 
+- name: create a dir
+  file: state=directory dest={{ kafka_manager_source_unarchive_prefix }}
+
 - name: unpack kafka-manager
   unarchive: copy=no src="/root/kafka-manager-{{ kafka_manager_version }}.tar.gz" dest={{ kafka_manager_source_unarchive_prefix }}
 
@@ -48,6 +51,9 @@
 
 - name: link /home/kafka-manager-{{ kafka_manager_version }}/consumer.properties
   file: state=link src=/etc/kafka-manager/consumer.properties dest=/home/kafka-manager-{{ kafka_manager_version }}/conf/consumer.properties
+
+- name: create kafka user
+  user: name=kafka shell=/usr/sbin/nologin
 
 - name: change ownership
   shell: chown -R kafka:kafka /home/kafka-manager-{{ kafka_manager_version }}
